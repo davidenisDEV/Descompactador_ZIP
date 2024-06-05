@@ -12,10 +12,20 @@ def descompactar_arquivos_zip(diretorio_zip, diretorio_destino):
         
         # Verifica se o arquivo é um zip
         if zipfile.is_zipfile(caminho_completo_arquivo):
-            with zipfile.ZipFile(caminho_completo_arquivo, 'r') as zip_ref:
-                # Extrai todos os arquivos para o diretório de destino
-                zip_ref.extractall(diretorio_destino)
-                print(f"Arquivo {arquivo} descompactado com sucesso.")
+            try:
+                with zipfile.ZipFile(caminho_completo_arquivo, 'r') as zip_ref:
+                    # Cria um subdiretório para cada arquivo zip
+                    subdiretorio = os.path.join(diretorio_destino, os.path.splitext(arquivo)[0])
+                    if not os.path.exists(subdiretorio):
+                        os.makedirs(subdiretorio)
+                    
+                    # Extrai todos os arquivos para o subdiretório
+                    zip_ref.extractall(subdiretorio)
+                    print(f"Arquivo {arquivo} descompactado com sucesso em {subdiretorio}.")
+            except zipfile.BadZipFile:
+                print(f"Arquivo {arquivo} está corrompido e não pode ser descompactado.")
+            except Exception as e:
+                print(f"Ocorreu um erro ao descompactar o arquivo {arquivo}: {e}")
         else:
             print(f"Arquivo {arquivo} não é um arquivo zip válido.")
 
